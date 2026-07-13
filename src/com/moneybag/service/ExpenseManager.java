@@ -1,6 +1,8 @@
 package com.moneybag.service;
 
+import com.moneybag.model.Budget;
 import com.moneybag.model.Category;
+import com.moneybag.model.Expense;
 import com.moneybag.model.Transaction;
 import com.moneybag.storage.Storage;
 import com.moneybag.storage.CsvStorage;
@@ -8,6 +10,7 @@ import com.moneybag.wallet.Wallet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,6 +27,7 @@ public class ExpenseManager {
     private List<Wallet> wallets;
     private List<Category> categories;
     private Storage storage; // tham chiếu đến interface storage để đảm bảo tính đa hình
+    private java.util.Map<Category, Budget> budgets;
 
     // để private constructor để không cho phép tạo đối tượng từ bên ngoài qua từ khóa 'new'
     private ExpenseManager() {
@@ -31,6 +35,7 @@ public class ExpenseManager {
         this.wallets = new ArrayList<>();
         this.categories = new ArrayList<>();
         this.storage = new CsvStorage(); //
+        this.budgets = new java.util.HashMap<>();
     }
 
     // cung cấp phương thức statics toàn cục để lấy ra thực thể duy nhất
@@ -58,6 +63,11 @@ public class ExpenseManager {
      */
     public void addTransaction(Transaction transaction) {
         if (transaction == null) return;
+        // kiểm tra xem khoản chi mới có làm lố ngân sách giới hạn không
+        if (transaction instanceof Expense) {
+            checkBudgetWarning((Expense)  transaction);
+        }
+
         Wallet wallet = transaction.getWallet();
         double amount = transaction.getAmount();
 
@@ -191,5 +201,47 @@ public class ExpenseManager {
     public List<Transaction> getTransactions() { return transactions; }
     public List<Wallet> getWallets() { return wallets; }
     public List<Category> getCategories() { return categories; }
+
+    /**
+     * Đặt hạn mức ngân sách cho một danh mục
+     */
+    public void addBudget(Budget budget) {
+        if (budget == null) return;
+        // đưa vào map với key là category và value là budget
+        this.budgets.put(budget.getCategory(), budget);
+    }
+
+    /**
+     * kiểm tra in ra cảnh báo nếu khoán chi vượt ngân sách
+     */
+    public void checkBudgetWarning(Expense newExpense) {
+        Category cat =  newExpense.getCategory();
+        // nếu danh mục không được đặt ngân sách thì bỏ qua
+        if (!budgets.containsKey(cat)) return;
+        Budget budget = budgets.get(cat);
+
+        double totalSpentInMonth = 0;
+
+        int currentMonth = newExpense.getDate().getMonthValue();
+        int currentYear = newExpense.getDate().getYear();
+
+        // tính tổng các khoản chi cùng tháng, cùng năm và cùng danh mục
+        for (Transaction t: transactions) {
+            if (t instanceof Expense && t.getCategory().getName().equals(cat.getName())) {
+                if (t.getDate().getMonthValue() == currentMonth && t.getDate().getYear() == currentYear) {
+                    totalSpentInMonth += Math.abs(t.getSignedAmount());
+                }
+            }
+        }
+        // cộng thêm số tiền của khaorn chi đang chuẩn bị thêm vào
+        totalSpentInMonth += newExpense.getAmount();
+
+        // gọi hàm đối tượng budget để kểm tra
+        if (budget.isExeeded(totalSpentInMonth)) {
+            System.out.println("[Cảnh báo ngân sách]: Bạn đã chi tiêu " +
+                    String.format("%,.0f", totalSpentInMonth) + " VNĐ cho danh mục [" +
+                    cat.getName() + "]. " + " Vượt quá hạn mức " + String.format("%,.0f", budget.getLimit()) + " VNĐ!");
+        }
+    }
 }
 
