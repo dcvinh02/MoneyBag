@@ -1,0 +1,51 @@
+1.Tại sao Transaction và Wallet lại là abstract class?
+
+Bởi vì trong thực tế, không có một giao dịch nào chung chung là "giao dịch",
+nó phải là "Khoản thu" hoặc "Khoản chi". Tương tự, không có cái ví nào là ví
+chung chung, nó phải là "Ví tiền mặt" hoặc "Tài khoản ngân hàng". Việc để
+abstract ngăn chặn việc khởi tạo vô nghĩa: new Transaction(); -> Lỗi compile
+ngay lập thể hiện tính Trừu tượng (Abstraction).
+
+2.Tính Đa hình (Polymorphic) thể hiện ở đâu?
+
+Hàm getSignedAmount() ở Transaction. Với Income, nó trả về số dương (+amount).
+Với Expense, nó trả về số âm (-amount). Khi tính tổng số dư, ExpenseManager
+chỉ cần duyệt một vòng lặp for (Transaction t : list) và cộng tất cả
+t.getSignedAmount() lại mà không cần dùng if-else hay instanceof để kiểm tra
+loại giao dịch. Đây là điểm cộng cực lớn trong mắt giảng viên.
+
+Hàm withdraw(double amount) của các loại ví : BankAccount có thể tính thêm
+phí rút tiền hoặc kiểm tra hạn mức , còn CashWallet thì không.
+
+Income:
+Hãy nhìn vào phương thức getSignedAmount() trong lớp Transaction. Bản thân lớp
+Transaction không biết số tiền này nên là số dương hay số âm. Nhưng khi ta tạo
+lớp Income (Khoản thu) và Expense (Khoản chi), hai lớp này sẽ tự quyết định dấu
+ của số tiền. Đó chính là Tính Đa hình (Polymorphism).
+
+Expense:
+Tại sao lại dùng extends?
+
+Đây là tính Kế thừa (Inheritance). Income và Expense tự động có các thuộc tính
+(id, amount, date...) của Transaction mà ta không cần viết lại. Giúp code tuân
+thủ nguyên tắc DRY (Don't Repeat Yourself).
+
+Từ khóa super() dùng để làm gì?
+
+Lớp cha (Transaction) có các thuộc tính private, lớp con không thể gán trực tiếp
+bằng this.amount = amount được. Ta phải dùng super(...) để truyền dữ liệu lên
+cho Constructor của lớp cha xử lý.
+
+Từ khóa @Override mang ý nghĩa gì?
+
+Đây là tính Đa hình (Polymorphism). Lớp cha yêu cầu "Hãy nói cho tôi biết kiểu
+giao dịch và số tiền thực tế".
+
+Income "ghi đè" (override) và bảo: "Tôi là thu, tiền của tôi là số dương".
+
+Expense "ghi đè" và bảo: "Tôi là chi, trả về số âm (-this.getAmount())".
+
+Về sau, khi tính tổng số dư trong tháng, ta chỉ cần gọi t.getSignedAmount(),
+Java sẽ tự biết lấy số dương hay số âm để cộng lại mà không cần dùng lệnh
+if-else.
+

@@ -1,0 +1,37 @@
+MoneyBag
+├── .git
+├── .gitignore
+├── README.md
+└── src
+    └── com
+        └── moneybag
+            ├── Main.java               # Điểm khởi chạy ứng dụng (Entry Point)
+            ├── model                   # Chứa các thực thể dữ liệu (Entities)
+            │   ├── Transaction.java
+            │   ├── Income.java
+            │   ├── Expense.java
+            │   └── RecurringExpense.java
+            ├── wallet                  # Tách biệt quản lý ví để dễ mở rộng logic rút/nạp
+            │   ├── Wallet.java
+            │   ├── CashWallet.java
+            │   ├── BankAccount.java
+            │   └── EWallet.java
+            ├── constant                # Thay vì gọi package enum, dùng 'constant' hoặc 'model.enums'
+            │   ├── TransactionType.java
+            │   ├── WalletType.java
+            │   └── Period.java
+            ├── service                 # Chứa logic nghiệp vụ (Business Logic)
+            │   └── ExpenseManager.java # Lớp điều phối chính (Singleton)
+            ├── storage                 # Tầng truy xuất dữ liệu (Data Access Layer)
+            │   ├── Storage.java        # Interface
+            │   ├── CsvStorage.java
+            │   └── JsonStorage.java
+            ├── factory                 # Chứa các Factory để khởi tạo object sạch sẽ
+            │   ├── TransactionFactory.java
+            │   └── WalletFactory.java
+            ├── exception               # Các ngoại lệ tự định nghĩa (Custom Exceptions)
+            │   ├── InsufficientBalanceException.java
+            │   └── InvalidInputException.java
+            └── view                    # Tầng hiển thị (Presentation Layer)
+                ├── ConsoleView.java    # Giao diện dòng lệnh
+                └── AppView.java        # Giao diện đồ họa (GUI) sau này
