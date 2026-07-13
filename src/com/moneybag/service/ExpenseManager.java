@@ -131,6 +131,51 @@ public class ExpenseManager {
         }
         return result;
     }
+    /**
+     * Khi sửa đổi số tiền giao dịch nếu sửa đổi truwcj tiếp sẽ rất dễ bug nên thay bằng xóa giao dịch cũ thêm giao dịch mới
+     * Cập nhật 1 giao dịch đã tồn tại
+     */
+    public boolean updateTransaction(String transactionId, Transaction newTransaction) {
+        // hàm removeTransaction đã bao gồm logic vaf hoàn lại tiền vào ví cũ
+        boolean isRemoved = removeTransaction(transactionId);
+        if (isRemoved) {
+            // hàm addTransaction đã bao gồm cộng trừ vào ví mới
+            addTransaction(newTransaction);
+            System.out.println("Cập nhật giao dịch thành công");
+            return true;
+        }
+        System.out.println("Cập nhật thất bại do không tìm thấy giao dịch cũ.");
+        return false;
+    }
+
+    /**
+     * Thống kê tổng thu, tổng chi và số dư trong 1 tháng cụ thể
+     *
+     */
+
+    public void displayMonthlySummary(int month, int year) {
+        double totalIncome = 0;
+        double totalExpense = 0;
+
+        for (Transaction t: transactions) {
+            java.time.LocalDate date = t.getDate();
+            //lọc các giao dịch trùng tháng và năm
+            if (date.getMonthValue() == month && date.getYear() == year) {
+                if (t.getSignedAmount() > 0) {
+                    totalIncome += t.getSignedAmount();
+                } else  {
+                    totalExpense += Math.abs(t.getSignedAmount());
+                }
+            }
+        }
+        double balance = totalIncome - totalExpense;
+
+        System.out.println("=== THỐNG KÊ THÁNG " + month + "/" + year + " ===");
+        System.out.printf("Tổng Thu: +%,.0f VNĐ\n", totalIncome);
+        System.out.printf("Tổng Chi: -%,.0f VNĐ\n", totalExpense);
+        System.out.printf("Số dư tháng: %,.0f VNĐ\n", balance);
+        System.out.println("=================================");
+    }
 
     /**
      * Tính tổng số dư hiện tại của các vị trí cộng lai

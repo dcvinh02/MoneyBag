@@ -1,6 +1,6 @@
 package com.moneybag.wallet;
 
-import com.moneybag.constant.WalletType:
+import com.moneybag.constant.WalletType;
 
 /**
  * Ví tiền mặt: kế thừa wallet
