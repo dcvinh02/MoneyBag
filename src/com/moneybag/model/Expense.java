@@ -22,7 +22,7 @@ public class Expense extends Transaction {
     }
 
     @Override
-    public double getSignAmount() {
+    public double getSignedAmount() {
         return -this.getAmount(); // khoản chi thì mang dấu âm -
     }
 
