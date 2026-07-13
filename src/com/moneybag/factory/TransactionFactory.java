@@ -37,7 +37,7 @@ public class TransactionFactory {
                      // nếu không có chu kỳ, tạo Expense bình thường
                      return new Expense(id, amount, date, note, category, wallet, extraInfo);
                      default:
-                         throw new IllegalAccessException("Loại giao dịch không được hệ thống hỗ trợ!");
+                         throw new IllegalArgumentException("Loại giao dịch không được hệ thống hỗ trợ!");
         }
     }
 }
