@@ -34,6 +34,8 @@ public abstract class Transaction {
 
     // --- Getter và Setter để truy cập dữ liệu an toàn (Đóng gói) [cite: 115] ---
     public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
     public double getAmount() { return amount; }
 
     // Setter có kiểm tra tính hợp lệ của dữ liệu đầu vào [cite: 45, 115]
@@ -48,4 +50,7 @@ public abstract class Transaction {
     public String getNote() { return note; }
     public Category getCategory() { return category; }
     public Wallet getWallet() { return wallet; }
+
+    // phục hồi tham chếu Ví từ file CSV
+    public void setWallet(Wallet wallet) { this.wallet = wallet; }
 }

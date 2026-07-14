@@ -1,0 +1,112 @@
+classDiagram
+    direction TB
+
+    %% Model Layer
+    class Transaction {
+        <<abstract>>
+        -String id
+        -double amount
+        -LocalDate date
+        -String note
+        -Category category
+        -Wallet wallet
+        +getType()* TransactionType
+        +getSignedAmount()* double
+        +printInfo()* void
+    }
+    class Income {
+        -String source
+        +getType() TransactionType
+        +getSignedAmount() double
+    }
+    class Expense {
+        -String paymentMethod
+        +getType() TransactionType
+        +getSignedAmount() double
+    }
+    class RecurringExpense {
+        -Period period
+        +nextDueDate() LocalDate
+    }
+    class Wallet {
+        <<abstract>>
+        -String name
+        -double balance
+        +deposit(double amount) void
+        +withdraw(double amount)* void
+    }
+    class CashWallet {
+        +withdraw(double amount) void
+    }
+    class BankAccount {
+        -String bankName
+        -String accountNumber
+        +withdraw(double amount) void
+    }
+    class EWallet {
+        -String provider
+        +withdraw(double amount) void
+    }
+    class Category {
+        -String name
+        -TransactionType type
+    }
+    class Budget {
+        -double limit
+        -Period period
+        +isExceeded(double spent) boolean
+    }
+
+    Transaction <|-- Income
+    Transaction <|-- Expense
+    Expense <|-- RecurringExpense
+    Wallet <|-- CashWallet
+    Wallet <|-- BankAccount
+    Wallet <|-- EWallet
+    Transaction --> Category
+    Transaction --> Wallet
+
+    %% Storage Layer
+    class Storage {
+        <<interface>>
+        +save(List~Transaction~ txs, String path) void
+        +load(String path) List~Transaction~
+    }
+    class CsvStorage {
+        +save(List~Transaction~ txs, String path) void
+        +load(String path) List~Transaction~
+    }
+    Storage <|.. CsvStorage
+
+    %% Service & Factory Layer
+    class ExpenseManager {
+        <<Singleton>>
+        -static ExpenseManager instance
+        -List~Transaction~ transactions
+        -List~Wallet~ wallets
+        -List~Category~ categories
+        -Map~Category, Budget~ budgets
+        -Storage storage
+        +getInstance() ExpenseManager
+        +addTransaction(Transaction t) void
+        +removeTransaction(String id) boolean
+        +loadData() void
+        +saveData() void
+    }
+    class TransactionFactory {
+        +createTransaction(...) static Transaction
+    }
+
+    ExpenseManager --> Storage
+    ExpenseManager --> Transaction
+    ExpenseManager --> Wallet
+    ExpenseManager --> Category
+    ExpenseManager --> Budget
+
+    %% View Layer
+    class ConsoleView {
+        -Scanner scanner
+        -ExpenseManager manager
+        +start() void
+    }
+    ConsoleView --> ExpenseManager

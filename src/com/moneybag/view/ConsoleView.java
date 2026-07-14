@@ -22,8 +22,11 @@ public class ConsoleView {
      * Vòng lặp chính của chương trình.
      */
     public void start() {
-        boolean isRunning = true;
+        // nạp dữ liệu
+        System.out.println("Đang khởi động hệ thống...");
+        manager.loadData();
 
+        boolean isRunning = true;
         while (isRunning) {
             printMenu();
             System.out.print("Nhập lựa chọn của bạn: ");
@@ -66,6 +69,7 @@ public class ConsoleView {
                     manageBudget();
                     break;
                 case 0:
+                    manager.saveData();
                     System.out.println("Cảm ơn bạn đã sử dụng MoneyBag. Tạm biệt!");
                     isRunning = false;
                     break;
@@ -124,10 +128,9 @@ public class ConsoleView {
         String name = scanner.nextLine();
 
         System.out.print("Nhập số dư ban đầu (VNĐ): ");
-        double balance = 0;
+        double initialBalance = 0;
         try {
-            // Ép kiểu từ String sang Double. Xử lý lỗi nếu người dùng cố tình nhập chữ.
-            balance = Double.parseDouble(scanner.nextLine());
+            initialBalance = Double.parseDouble(scanner.nextLine());
         } catch (NumberFormatException e) {
             System.out.println("❌ Lỗi: Bạn nhập không phải là số! Số dư mặc định sẽ là 0 VNĐ.");
         }
@@ -138,28 +141,50 @@ public class ConsoleView {
 
         com.moneybag.wallet.Wallet wallet;
 
-        // Dựa vào lựa chọn để khởi tạo đúng lớp con (Kế thừa & Đa hình)
+        // BƯỚC NGOẶT: Khởi tạo ví với số dư = 0 để quản lý dòng tiền 100% qua Giao dịch
         switch (typeInput) {
             case "2":
                 System.out.print("Nhập tên Ngân hàng (VD: TPBank): ");
                 String bankName = scanner.nextLine();
                 System.out.print("Nhập số tài khoản: ");
                 String accNum = scanner.nextLine();
-                wallet = new com.moneybag.wallet.BankAccount(name, balance, bankName, accNum);
+                wallet = new com.moneybag.wallet.BankAccount(name, 0, bankName, accNum);
                 break;
             case "3":
                 System.out.print("Nhập tên nhà cung cấp (VD: MoMo, ZaloPay): ");
                 String provider = scanner.nextLine();
-                wallet = new com.moneybag.wallet.EWallet(name, balance, provider);
+                wallet = new com.moneybag.wallet.EWallet(name, 0, provider);
                 break;
             case "1":
             default:
-                wallet = new com.moneybag.wallet.CashWallet(name, balance);
+                wallet = new com.moneybag.wallet.CashWallet(name, 0);
                 break;
         }
 
         manager.addWallet(wallet);
-        System.out.println("✅ Đã thêm ví thành công: " + name + " | Số dư: " + String.format("%,.0f", balance) + " VNĐ");
+
+        // NẾU CÓ SỐ DƯ, HỆ THỐNG SẼ TỰ ĐỘNG TẠO 1 GIAO DỊCH THU ĐỂ GHI SỔ (Auto-save an toàn)
+        if (initialBalance > 0) {
+            com.moneybag.model.Category initCat = new com.moneybag.model.Category("Khởi tạo", com.moneybag.constant.TransactionType.INCOME);
+            // Chỉ thêm danh mục nếu chưa có
+            if (manager.getCategories().stream().noneMatch(c -> c.getName().equals("Khởi tạo"))) {
+                manager.addCategory(initCat);
+            }
+
+            com.moneybag.model.Transaction openingTx = com.moneybag.factory.TransactionFactory.createTransaction(
+                    com.moneybag.constant.TransactionType.INCOME,
+                    initialBalance,
+                    java.time.LocalDate.now(),
+                    "Số dư ban đầu",
+                    initCat,
+                    wallet,
+                    "Hệ thống",
+                    null
+            );
+            manager.addTransaction(openingTx);
+        }
+
+        System.out.println("✅ Đã thêm ví thành công: " + name + " | Số dư: " + String.format("%,.0f", wallet.getBalance()) + " VNĐ");
     }
     /**
      * Chức năng [1]: Thêm giao dịch mới.

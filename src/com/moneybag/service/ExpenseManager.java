@@ -243,5 +243,68 @@ public class ExpenseManager {
                     cat.getName() + "]. " + " Vượt quá hạn mức " + String.format("%,.0f", budget.getLimit()) + " VNĐ!");
         }
     }
+    /**
+     * Nạp dữ liệu từ file khi khởi động phần mềm.
+     */
+    /**
+     * Nạp dữ liệu từ file khi khởi động phần mềm.
+     * Áp dụng nguyên tắc Idempotent: Xóa sạch bộ nhớ trước khi nạp để chống nhân đôi dữ liệu.
+     */
+    public void loadData() {
+        try {
+            java.util.List<com.moneybag.model.Transaction> loadedTransactions = storage.load("transactions.csv");
+
+            // --- BẢN VÁ LỖI (HOTFIX): DỌN DẸP BỘ NHỚ TRƯỚC KHI NẠP ---
+            this.transactions.clear();
+            this.wallets.clear();
+            this.categories.clear();
+            if (this.budgets != null) {
+                this.budgets.clear();
+            }
+            // --------------------------------------------------------
+
+            for (com.moneybag.model.Transaction t : loadedTransactions) {
+                // 1. Phục hồi Danh mục
+                boolean catExists = categories.stream().anyMatch(c -> c.getName().equals(t.getCategory().getName()));
+                if (!catExists) {
+                    categories.add(t.getCategory());
+                }
+
+                // 2. Phục hồi Ví
+                com.moneybag.wallet.Wallet targetWallet = null;
+                for (com.moneybag.wallet.Wallet w : wallets) {
+                    if (w.getName().equals(t.getWallet().getName())) {
+                        targetWallet = w;
+                        break;
+                    }
+                }
+
+                if (targetWallet == null) {
+                    targetWallet = t.getWallet();
+                    wallets.add(targetWallet);
+                } else {
+                    t.setWallet(targetWallet);
+                }
+
+                // 3. Xử lý cộng/trừ tiền an toàn
+                addTransaction(t);
+            }
+            System.out.println("📂 Đã nạp thành công " + loadedTransactions.size() + " giao dịch từ hệ thống!");
+        } catch (java.io.IOException e) {
+            System.out.println("⚠️ Không tìm thấy file dữ liệu cũ, hệ thống sẽ bắt đầu với dữ liệu trống.");
+        }
+    }
+
+    /**
+     * Lưu toàn bộ dữ liệu ra file trước khi thoát.
+     */
+    public void saveData() {
+        try {
+            storage.save(this.transactions, "transactions.csv");
+            System.out.println("💾 Đã lưu an toàn toàn bộ dữ liệu vào file 'transactions.csv'.");
+        } catch (IOException e) {
+            System.out.println("❌ Lỗi nghiêm trọng: Không thể lưu file - " + e.getMessage());
+        }
+    }
 }
 
