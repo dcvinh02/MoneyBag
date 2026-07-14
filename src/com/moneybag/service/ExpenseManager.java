@@ -130,12 +130,12 @@ public class ExpenseManager {
     /**
      * Tìm kiếm danh mục theo ngày
      */
-    public List<Transaction> findTransactions(java.time.LocalDate startDate, java.time.LocalDate endDate) {
+    public List<Transaction> findTransactions(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate) {
         List<Transaction> result = new ArrayList<>();
         for (Transaction t: transactions) {
-            java.time.LocalDate date = t.getDate();
+            java.time.LocalDateTime date = t.getDate();
             // kiểm tra ngày có nằm trong khoảng không ( bao gồm 2 đầu )
-            if (!date.isBefore(startDate) && date.isAfter(endDate)) {
+            if (!date.isBefore(startDate) && !date.isAfter(endDate)) {
                 result.add(t);
             }
         }
@@ -168,7 +168,7 @@ public class ExpenseManager {
         double totalExpense = 0;
 
         for (Transaction t: transactions) {
-            java.time.LocalDate date = t.getDate();
+            java.time.LocalDateTime date = t.getDate();
             //lọc các giao dịch trùng tháng và năm
             if (date.getMonthValue() == month && date.getYear() == year) {
                 if (t.getSignedAmount() > 0) {

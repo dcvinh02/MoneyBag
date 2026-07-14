@@ -4,7 +4,7 @@ import com.moneybag.constant.Period;
 import com.moneybag.constant.TransactionType;
 import com.moneybag.model.*;
 import com.moneybag.wallet.Wallet;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID; // thư viện tạo ID
 
 /**
@@ -15,7 +15,7 @@ public class TransactionFactory {
     public static Transaction createTransaction(
             TransactionType type,
             double amount,
-            LocalDate date,
+            LocalDateTime date,
             String note,
             Category category,
             Wallet wallet,

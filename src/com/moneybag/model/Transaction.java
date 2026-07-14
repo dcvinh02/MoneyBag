@@ -2,7 +2,7 @@ package com.moneybag.model;
 
 import com.moneybag.constant.TransactionType;
 import com.moneybag.wallet.Wallet;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * lớp đại diện cho một giao dịch tài chính chung
@@ -10,13 +10,13 @@ import java.time.LocalDate;
 public abstract class Transaction {
     private String id;
     private double amount;
-    private LocalDate date;
+    private LocalDateTime date;
     private String note;
     private Category category;
     private Wallet wallet;
 
     // constructor
-    public Transaction(String id, double amount, LocalDate date, String note, Category category, Wallet wallet) {
+    public Transaction(String id, double amount, LocalDateTime date, String note, Category category, Wallet wallet) {
         this.id = id;
         this.amount = amount;
         this.date = date;
@@ -44,7 +44,7 @@ public abstract class Transaction {
         this.amount = amount;
     }
 
-    public LocalDate getDate() { return date; }
+    public LocalDateTime getDate() { return date; }
     public String getNote() { return note; }
     public Category getCategory() { return category; }
     public Wallet getWallet() { return wallet; }

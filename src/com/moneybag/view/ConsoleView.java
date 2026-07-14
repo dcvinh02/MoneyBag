@@ -163,7 +163,7 @@ public class ConsoleView {
             com.moneybag.model.Transaction openingTx = com.moneybag.factory.TransactionFactory.createTransaction(
                     com.moneybag.constant.TransactionType.INCOME,
                     initialBalance,
-                    java.time.LocalDate.now(),
+                    java.time.LocalDateTime.now(),
                     "Số dư ban đầu",
                     initCat,
                     wallet,
@@ -233,7 +233,7 @@ public class ConsoleView {
 
             // Đưa dữ kiệu vào factory để sản xuất giiao dịch.
             com.moneybag.model.Transaction newTx = com.moneybag.factory.TransactionFactory.createTransaction(
-                    type, amount, java.time.LocalDate.now(), note, selectedCategory, selectedWallet, extraInfo, null
+                    type, amount, java.time.LocalDateTime.now(), note, selectedCategory, selectedWallet, extraInfo, null
             );
 
             //  balance lại ví

@@ -2,7 +2,7 @@ package com.moneybag.model;
 
 import com.moneybag.constant.TransactionType;
 import com.moneybag.wallet.Wallet;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Khoản chi: kế thừa Transaction
@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class Expense extends Transaction {
     private String paymentMethod; // phương thức thanh toán ( quẹt thẻ, tiền mặt )
 
-    public Expense(String id, double amount, LocalDate date, String note, Category category, Wallet wallet, String paymentMethod) {
+    public Expense(String id, double amount, LocalDateTime date, String note, Category category, Wallet wallet, String paymentMethod) {
         super(id, amount, date, note, category, wallet);
         this.paymentMethod = paymentMethod;
     }

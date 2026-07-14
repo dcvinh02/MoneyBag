@@ -2,7 +2,7 @@ package com.moneybag.model;
 
 import com.moneybag.constant.TransactionType;
 import com.moneybag.wallet.Wallet;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Khoản thu: Kế thừa từ Transaction
@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class Income extends Transaction {
     private String source; //Nguồn thu
 
-    public Income(String id, double amount, LocalDate date, String note, Category category, Wallet wallet, String source) {
+    public Income(String id, double amount, LocalDateTime date, String note, Category category, Wallet wallet, String source) {
         super(id, amount, date, note, category, wallet);
         // dùng super để gọi constructor của lớp cha (Transaction)
         this.source = source;

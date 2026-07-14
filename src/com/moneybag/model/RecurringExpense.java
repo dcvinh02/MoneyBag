@@ -2,7 +2,7 @@ package com.moneybag.model;
 
 import com.moneybag.constant.Period;
 import com.moneybag.wallet.Wallet;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Khoản chi định kỳ: kế thừa từ expense
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class RecurringExpense extends Expense {
     private Period period; //Chu kì thanh toán định kỳ
 
-    public RecurringExpense(String id, double amount, LocalDate date, String note, Category category, Wallet wallet, String paymentMethod, Period period) {
+    public RecurringExpense(String id, double amount, LocalDateTime date, String note, Category category, Wallet wallet, String paymentMethod, Period period) {
         // Gọi lại constructor của lớp cha là Expense
         super(id, amount, date, note, category, wallet, paymentMethod);
         this.period = period;
@@ -19,8 +19,8 @@ public class RecurringExpense extends Expense {
     /**
      * Tính toán ngày gia hạn kế tiếp dựa trên chu kì đã chọn
      */
-    public LocalDate nextDueDate() {
-        LocalDate current = this.getDate();
+    public LocalDateTime nextDueDate() {
+        LocalDateTime current = this.getDate();
         if (period == null) return current;
 
         // cấu trúc swich-case để xử lý đa dạng các chu kì

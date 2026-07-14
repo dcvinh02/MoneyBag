@@ -65,7 +65,7 @@ public class CsvStorage implements Storage {
                         String id = parts[0];
                         com.moneybag.constant.TransactionType type = com.moneybag.constant.TransactionType.valueOf(parts[1]);
                         double amount = Double.parseDouble(parts[2]);
-                        java.time.LocalDate date = java.time.LocalDate.parse(parts[3]);
+                        java.time.LocalDateTime date = java.time.LocalDateTime.parse(parts[3]);
                         String note = parts[4];
 
                         // tái tạo category và wallet
