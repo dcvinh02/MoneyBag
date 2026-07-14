@@ -4,23 +4,18 @@ import com.moneybag.service.ExpenseManager;
 
 import java.util.Scanner;
 
-/**
- * Lớp chịu trách nhiệm hiển thị giao diện dòng lệnh (CLI) và tương tác với người dùng.
- * Tầng View KHÔNG chứa logic tính toán, chỉ làm nhiệm vụ Nhập/Xuất và gọi xuống tầng Service.
- */
+
 public class ConsoleView {
     private Scanner scanner;
     private ExpenseManager manager;
 
     public ConsoleView() {
         this.scanner = new Scanner(System.in);
-        // Gọi Singleton để lấy ra bản thể duy nhất của hệ thống quản lý
+        // call Singleton để lấy ra base của hệ thống quản lý
         this.manager = ExpenseManager.getInstance();
     }
 
-    /**
-     * Vòng lặp chính của chương trình.
-     */
+    // main
     public void start() {
         // nạp dữ liệu
         System.out.println("Đang khởi động hệ thống...");
@@ -32,10 +27,10 @@ public class ConsoleView {
             System.out.print("Nhập lựa chọn của bạn: ");
             String input = scanner.nextLine();
 
-            // Kiểm tra xem input có phải là số từ 0 đến 9 không bằng Regular Expression
+            // kiểm tra xem input có hợp lệ không
             if (!input.matches("[0-9]")) {
-                System.out.println("Action is not supported\n"); // Yêu cầu bắt buộc của đề bài
-                continue; // Bỏ qua các lệnh dưới, quay lại vòng lặp mới
+                System.out.println("Hành động không được hỗ trợ\n");
+                continue; // nếu không hợp lệ quay lại vòng lặp mới
             }
 
             int choice = Integer.parseInt(input);
@@ -80,9 +75,7 @@ public class ConsoleView {
         }
     }
 
-    /**
-     * In ra Menu chính xác theo yêu cầu của đề bài.
-     */
+    // menu
     private void printMenu() {
         System.out.println("\nChào mừng tới MoneyBag!");
         System.out.println("[1] Thêm giao dịch");
@@ -107,8 +100,6 @@ public class ConsoleView {
         System.out.println("Loại danh mục: [1] Thu nhập (INCOME)   [2] Chi tiêu (EXPENSE)");
         System.out.print("Lựa chọn (1 hoặc 2): ");
         String typeInput = scanner.nextLine();
-
-        // Sử dụng toán tử 3 ngôi (Ternary operator) cho gọn code
         com.moneybag.constant.TransactionType type = typeInput.equals("1")
                 ? com.moneybag.constant.TransactionType.INCOME
                 : com.moneybag.constant.TransactionType.EXPENSE;
@@ -120,7 +111,6 @@ public class ConsoleView {
 
     /**
      * Chức năng [7]: Thêm ví/tài khoản mới.
-     * Áp dụng tính Đa hình khi khởi tạo các loại ví khác nhau.
      */
     private void manageWallet() {
         System.out.println("\n--- THÊM VÍ / TÀI KHOẢN MỚI ---");
@@ -141,7 +131,6 @@ public class ConsoleView {
 
         com.moneybag.wallet.Wallet wallet;
 
-        // BƯỚC NGOẶT: Khởi tạo ví với số dư = 0 để quản lý dòng tiền 100% qua Giao dịch
         switch (typeInput) {
             case "2":
                 System.out.print("Nhập tên Ngân hàng (VD: TPBank): ");
@@ -163,10 +152,10 @@ public class ConsoleView {
 
         manager.addWallet(wallet);
 
-        // NẾU CÓ SỐ DƯ, HỆ THỐNG SẼ TỰ ĐỘNG TẠO 1 GIAO DỊCH THU ĐỂ GHI SỔ (Auto-save an toàn)
+        // auto-save
         if (initialBalance > 0) {
             com.moneybag.model.Category initCat = new com.moneybag.model.Category("Khởi tạo", com.moneybag.constant.TransactionType.INCOME);
-            // Chỉ thêm danh mục nếu chưa có
+            // chỉ thêm danh mục nếu chưa có
             if (manager.getCategories().stream().noneMatch(c -> c.getName().equals("Khởi tạo"))) {
                 manager.addCategory(initCat);
             }
@@ -192,7 +181,7 @@ public class ConsoleView {
     private void addTransaction() {
         System.out.println("\n--- THÊM GIAO DỊCH MỚI ---");
 
-        // 1. Kiểm tra điều kiện: Phải có ít nhất 1 Ví và 1 Danh mục mới cho phép thêm
+        // kiểm tra điều kiện: Phải có ít nhaats 1 ví và 1 danh mục mới cho phép thêm
         if (manager.getWallets().isEmpty()) {
             System.out.println("❌ Bạn chưa có ví nào. Vui lòng chọn [7] để thêm ví trước!");
             return;
@@ -203,7 +192,7 @@ public class ConsoleView {
         }
 
         try {
-            // 2. Chọn Ví
+            // chọn Ví
             System.out.println("Danh sách Ví:");
             for (int i = 0; i < manager.getWallets().size(); i++) {
                 System.out.println((i + 1) + ". " + manager.getWallets().get(i).getName()
@@ -213,7 +202,7 @@ public class ConsoleView {
             int walletIndex = Integer.parseInt(scanner.nextLine()) - 1;
             com.moneybag.wallet.Wallet selectedWallet = manager.getWallets().get(walletIndex);
 
-            // 3. Chọn Danh mục
+            // chọn danh mục
             System.out.println("Danh sách Danh mục:");
             for (int i = 0; i < manager.getCategories().size(); i++) {
                 System.out.println((i + 1) + ". " + manager.getCategories().get(i).getName()
@@ -223,14 +212,15 @@ public class ConsoleView {
             int categoryIndex = Integer.parseInt(scanner.nextLine()) - 1;
             com.moneybag.model.Category selectedCategory = manager.getCategories().get(categoryIndex);
 
-            // 4. Nhập số tiền và Ghi chú
+            //nhập số tiền và Ghi chú
+
             System.out.print("Nhập số tiền (VNĐ): ");
             double amount = Double.parseDouble(scanner.nextLine());
 
             System.out.print("Nhập ghi chú ngắn gọn: ");
             String note = scanner.nextLine();
 
-            // 5. Thu thập thông tin phụ tùy vào loại danh mục
+            // thu thập thông tin phụ tùy vào loại danh mục
             String extraInfo = "";
             com.moneybag.constant.TransactionType type = selectedCategory.getType();
             if (type == com.moneybag.constant.TransactionType.INCOME) {
@@ -241,13 +231,12 @@ public class ConsoleView {
                 extraInfo = scanner.nextLine();
             }
 
-            // 6. Đưa nguyên liệu vào Nhà máy (Factory) để sản xuất Giao dịch.
-            // Tạm thời gán ngày là hôm nay (LocalDate.now())
+            // Đưa dữ kiệu vào factory để sản xuất giiao dịch.
             com.moneybag.model.Transaction newTx = com.moneybag.factory.TransactionFactory.createTransaction(
                     type, amount, java.time.LocalDate.now(), note, selectedCategory, selectedWallet, extraInfo, null
             );
 
-            // 7. Giao cho Manager xử lý (Manager sẽ tự lo việc cộng/trừ tiền trong ví)
+            //  balance lại ví
             manager.addTransaction(newTx);
             System.out.println("✅ Đã thêm giao dịch thành công!");
 
@@ -262,8 +251,7 @@ public class ConsoleView {
     }
 
     /**
-     * Chức năng [5]: Hiển thị tất cả giao dịch.
-     * Tận dụng Đa hình: Lệnh t.printInfo() sẽ tự biết in kiểu Thu hay kiểu Chi.
+     * Hiển thị tất cả giao dịch.
      */
     private void displayAllTransactions() {
         System.out.println("\n--- LỊCH SỬ GIAO DỊCH ---");
@@ -280,8 +268,6 @@ public class ConsoleView {
     }
     /**
      * Chức năng [2]: Xóa giao dịch.
-     * Mẹo UX: Vì ID của giao dịch là chuỗi UUID rất dài, ta không bắt người dùng gõ UUID.
-     * Ta in ra danh sách theo số thứ tự (1, 2, 3...) và cho người dùng chọn số.
      */
     private void removeTransaction() {
         System.out.println("\n--- XÓA GIAO DỊCH ---");

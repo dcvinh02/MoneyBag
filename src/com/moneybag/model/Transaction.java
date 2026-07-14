@@ -5,11 +5,9 @@ import com.moneybag.wallet.Wallet;
 import java.time.LocalDate;
 
 /**
- * Lớp trừu tượng đại diện cho một giao dịch tài chính chung.
- * Thể hiện tính Trừu tượng (Abstraction) trong OOP[cite: 12, 119].
+ * lớp đại diện cho một giao dịch tài chính chung
  */
 public abstract class Transaction {
-    // Đóng gói (Encapsulation): Các thuộc tính để private để bảo vệ dữ liệu [cite: 12, 115]
     private String id;
     private double amount;
     private LocalDate date;
@@ -17,7 +15,7 @@ public abstract class Transaction {
     private Category category;
     private Wallet wallet;
 
-    // Constructor để các lớp con gọi thông qua super()
+    // constructor
     public Transaction(String id, double amount, LocalDate date, String note, Category category, Wallet wallet) {
         this.id = id;
         this.amount = amount;
@@ -27,18 +25,18 @@ public abstract class Transaction {
         this.wallet = wallet;
     }
 
-    // --- Các phương thức trừu tượng buộc lớp con phải tự định nghĩa (Tính Đa hình) [cite: 117, 119] ---
+    // các phương thức buộc lớp con phải tự định nghĩa
     public abstract TransactionType getType();
     public abstract double getSignedAmount();
     public abstract void printInfo();
 
-    // --- Getter và Setter để truy cập dữ liệu an toàn (Đóng gói) [cite: 115] ---
+    // -getter và Setter để truy cập dữ liệu
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
     public double getAmount() { return amount; }
 
-    // Setter có kiểm tra tính hợp lệ của dữ liệu đầu vào [cite: 45, 115]
+    // kiểm tra tính hợp lệ của dữ liệu đầu vào
     public void setAmount(double amount) {
         if (amount < 0) {
             throw new IllegalArgumentException("Số tiền không được âm!");

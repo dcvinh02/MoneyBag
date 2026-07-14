@@ -147,4 +147,104 @@ public class MainFrame extends JFrame {
             lblBalance.setForeground(Color.RED);
         }
     }
+
+    // popup nhập giao dịch mưới
+    /**
+     * Hiển thị cửa sổ Popup để người dùng nhập thông tin giao dịch mới.
+     */
+    private void showAddTransactionDialog() {
+        // 1. Tạo một cửa sổ Dialog mới bọc trên MainFrame
+        JDialog dialog = new JDialog(this, "Thêm Giao Dịch Mới", true);
+        dialog.setSize(400, 350);
+        dialog.setLocationRelativeTo(this); // Hiển thị ở giữa cửa sổ chính
+
+        // Sử dụng GridLayout để chia form thành 6 hàng x 2 cột
+        dialog.setLayout(new GridLayout(6, 2, 10, 15));
+
+        // 2. Chuẩn bị các thành phần giao diện (UI Components)
+        JComboBox<String> cbWallet = new JComboBox<>();
+        for (com.moneybag.wallet.Wallet w : manager.getWallets()) {
+            cbWallet.addItem(w.getName() + " (" + String.format("%,.0f", w.getBalance()) + " VNĐ)");
+        }
+
+        JComboBox<String> cbCategory = new JComboBox<>();
+        for (com.moneybag.model.Category c : manager.getCategories()) {
+            cbCategory.addItem(c.getName() + " [" + c.getType() + "]");
+        }
+
+        JTextField txtAmount = new JTextField();
+        JTextField txtNote = new JTextField();
+        JTextField txtExtra = new JTextField(); // Dùng chung cho Nguồn thu / PT Thanh toán
+
+        // 3. Đưa các thành phần vào Form
+        dialog.add(new JLabel(" Chọn Ví:"));
+        dialog.add(cbWallet);
+        dialog.add(new JLabel(" Chọn Danh mục:"));
+        dialog.add(cbCategory);
+        dialog.add(new JLabel(" Số tiền (VNĐ):"));
+        dialog.add(txtAmount);
+        dialog.add(new JLabel(" Ghi chú:"));
+        dialog.add(txtNote);
+        dialog.add(new JLabel(" Nguồn / Phương thức TT:"));
+        dialog.add(txtExtra);
+
+        // 4. Tạo nút Lưu và Hủy
+        JButton btnSave = new JButton("Lưu Giao Dịch");
+        btnSave.setBackground(new Color(0, 153, 76)); // Nút màu xanh lá
+        btnSave.setForeground(Color.WHITE);
+
+        JButton btnCancel = new JButton("Hủy");
+
+        // 5. Xử lý logic khi bấm nút Lưu
+        btnSave.addActionListener(e -> {
+            try {
+                int walletIdx = cbWallet.getSelectedIndex();
+                int catIdx = cbCategory.getSelectedIndex();
+
+                if (walletIdx < 0 || catIdx < 0) {
+                    JOptionPane.showMessageDialog(dialog, "Vui lòng tạo Ví và Danh mục trước (qua bản Console)!");
+                    return;
+                }
+
+                // Lấy đối tượng thật từ Manager dựa trên vị trí người dùng chọn trên ComboBox
+                com.moneybag.wallet.Wallet selectedWallet = manager.getWallets().get(walletIdx);
+                com.moneybag.model.Category selectedCategory = manager.getCategories().get(catIdx);
+
+                double amount = Double.parseDouble(txtAmount.getText());
+                String note = txtNote.getText();
+                String extra = txtExtra.getText();
+
+                // Đưa vào Factory sản xuất
+                com.moneybag.model.Transaction newTx = com.moneybag.factory.TransactionFactory.createTransaction(
+                        selectedCategory.getType(), amount, java.time.LocalDate.now(), note, selectedCategory, selectedWallet, extra, null
+                );
+
+                // Thêm vào hệ thống
+                manager.addTransaction(newTx);
+
+                // Tự động làm mới bảng hiển thị
+                refreshTableData();
+
+                // Đóng cửa sổ Popup
+                dialog.dispose();
+                JOptionPane.showMessageDialog(this, "✅ Thêm giao dịch thành công!");
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "❌ Lỗi: Số tiền phải là chữ số hợp lệ!", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                // Bắt các lỗi nghiệp vụ (VD: Tiền mặt không đủ số dư)
+                JOptionPane.showMessageDialog(dialog, "❌ Lỗi nghiệp vụ: " + ex.getMessage(), "Từ chối giao dịch", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Tắt cửa sổ khi bấm Hủy
+        btnCancel.addActionListener(e -> dialog.dispose());
+
+        dialog.add(btnSave);
+        dialog.add(btnCancel);
+
+        // Hiển thị Form lên màn hình
+        dialog.setVisible(true);
+    }
+
 }

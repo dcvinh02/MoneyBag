@@ -3,7 +3,7 @@ package com.moneybag.wallet;
 import com.moneybag.constant.WalletType;
 
 /**
- * Ví điện tử: kế thừa wallet, thêm nhà cung cấp
+ * ví điện tử: kế thừa wallet, thêm nhà cung cấp
  */
 public class EWallet extends Wallet {
     private String provider; // ví dụ: momo, zalopay, shopeepay

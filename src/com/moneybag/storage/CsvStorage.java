@@ -14,9 +14,9 @@ public class CsvStorage implements Storage {
 
     @Override
     public void save(List<Transaction> transactions, String filePath) throws IOException {
-        // CỰC KỲ QUAN TRỌNG: Mở FileWriter KHÔNG có tham số true để nó xóa sạch file cũ trước khi ghi mới
+        // mở FileWriter kh có tham số true để nó xóa sạch file cũ trước khi ghi mới
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, false))) {
-            // Ghi dòng tiêu đề chuẩn, không chứa dấu ngoặc kép bọc ngoài
+            // ghi tiêu đề chuẩn
             writer.write("id,type,amount,date,note,category,wallet,extraInfo");
             writer.newLine();
 
@@ -30,7 +30,7 @@ public class CsvStorage implements Storage {
                     extraInfo = ((Expense) t).getPaymentMethod();
                 }
 
-                // Ghi chuỗi thuần túy, phân tách bằng dấu phẩy
+                // ghi chuỗi base, phân tách bằng dấu phẩy
                 String line = String.format("%s,%s,%.0f,%s,%s,%s,%s,%s",
                         t.getId(),
                         type,

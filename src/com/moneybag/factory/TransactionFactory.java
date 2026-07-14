@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.UUID; // thư viện tạo ID
 
 /**
- * Khỏi tạo các đối tượng transaction phức tạp
+ * khỏi tạo các đối tượng transaction phức tạp
  */
 public class TransactionFactory {
     // phương thức tính static khởi tạo giao dịch mà không cần khởi tạo Fatory
@@ -24,7 +24,7 @@ public class TransactionFactory {
     ) {
         // tự dộng sinh ra 1 ID random và duy nhất
         String id = UUID.randomUUID().toString();
-        // Dựa vào loại giao dịch (type) để quyết định sẽ gọi Constructor của Class nào
+        // dựa vào loại giao dịch (type) để quyết định sẽ gọi Constructor của Class nào
         switch (type) {
             case INCOME:
                 return new Income(id, amount, date, note, category, wallet, extraInfo);

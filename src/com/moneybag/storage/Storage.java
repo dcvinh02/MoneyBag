@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Interface định nghĩa các hành vi lưu trữ dữ liệu chung
+ * định nghĩa các hành vi lưu trữ dữ liệu chung
  */
 public interface Storage {
     // lưu danh sách giao dịch vào một đươờng dẫn file

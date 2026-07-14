@@ -3,7 +3,7 @@ package com.moneybag.model;
 import com.moneybag.constant.TransactionType;
 
 /**
- * Đại diện cho mục thu/chi
+ * đại diện cho mục thu/chi
  */
 public class Category {
     private String name;
